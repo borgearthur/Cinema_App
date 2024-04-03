@@ -18,11 +18,6 @@
     src="https://img.shields.io/github/commit-activity/t/Thomazrlima/Udemy_Courses?style=flat&logo=github"
     alt="Commit Activity"
   />
-  <a href="LICENSE.md"
-    ><img
-      src="https://img.shields.io/github/license/Thomazrlima/Udemy_Courses"
-      alt="License"
-  /></a>
 </p>
 
 # Seu Projeto 
@@ -39,13 +34,13 @@ Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem
 <p>Links Importantes</p>
 <ul>
     <li>
-    <a  href=""
+    <a  href="https://cinema-fds.atlassian.net/jira/software/projects/CAP/boards/1?atlOrigin=eyJpIjoiZDNjZDc0MTFjODkxNDMyZTk5YzhmNmQ2ZTVlOTZmY2EiLCJwIjoiaiJ9"
       >Link do Jira</a
     >
   </li>
   <li>
     <a  href="https://www.figma.com/file/Ms5aUXSnImGqW7S97h7m92/Wireframe-Template-(Community)?type=design&node-id=0%3A1&mode=design&t=v2NZ8sR463NZwdIk-1"
-      >[Protótipo Lo-Fi]</a
+      >Protótipo Lo-Fi</a
     >
   </li>
 </ul>
