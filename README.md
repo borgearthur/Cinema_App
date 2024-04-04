@@ -18,20 +18,15 @@
     src="https://img.shields.io/github/commit-activity/t/Thomazrlima/Udemy_Courses?style=flat&logo=github"
     alt="Commit Activity"
   />
-  <a href="LICENSE.md"
-    ><img
-      src="https://img.shields.io/github/license/Thomazrlima/Udemy_Courses"
-      alt="License"
-  /></a>
 </p>
 
 # Seu Projeto 
 
-Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.
+Projeto da disciplina de Fundamentos de Desenvolvimento de Software (FDS) [Em andamento]
 
 ## 🗪 Visão Geral
 
-Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.
+Esta plataforma é uma aplicação web com design adaptável que conecta donos de cinema a consumidores. Desenvolvida em Python com o framework Django, a aplicação oferece diversas funcionalidades aos usuários, de modo que os donos podem adicionar e modificar exibições de acordo com suas necessidades e os consumidores podem favoritar seus filmes para conveniência. Este projeto é parte da disciplina de Fundamentos de Desenvolvimento de Software (FDS).
 
 ## 🔧 Funcionalidades Adicionadas
 
@@ -39,13 +34,13 @@ Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem
 <p>Links Importantes</p>
 <ul>
     <li>
-    <a  href=""
+    <a  href="https://cinema-fds.atlassian.net/jira/software/projects/CAP/boards/1"
       >Link do Jira</a
     >
   </li>
   <li>
     <a  href="https://www.figma.com/file/Ms5aUXSnImGqW7S97h7m92/Wireframe-Template-(Community)?type=design&node-id=0%3A1&mode=design&t=v2NZ8sR463NZwdIk-1"
-      >[Protótipo Lo-Fi]</a
+      >Protótipo Lo-Fi</a
     >
   </li>
 </ul>
@@ -54,6 +49,6 @@ Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem
 
 <ul>
   <li>
-    <a href="">Arthur de Assis Borges</a> - aab4@cesar.school 📩
+    <a href="https://github.com/borgearthur">Arthur de Assis Borges</a> - <a href ="mailto:aab4@cesar.school"> aab4@cesar.school</a> 📩
   </li>
 </ul>
