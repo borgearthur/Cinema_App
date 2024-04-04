@@ -34,7 +34,11 @@ Esta plataforma é uma aplicação web com design adaptável que conecta donos d
 <p>Links Importantes</p>
 <ul>
     <li>
+<<<<<<< HEAD
     <a  href="https://cinema-fds.atlassian.net/jira/software/projects/CAP/boards/1"
+=======
+    <a  href="https://cinema-fds.atlassian.net/jira/software/projects/CAP/boards/1?atlOrigin=eyJpIjoiZDNjZDc0MTFjODkxNDMyZTk5YzhmNmQ2ZTVlOTZmY2EiLCJwIjoiaiJ9"
+>>>>>>> a2b183cbebce6ea2d12b0170e879b3ab1b89b30b
       >Link do Jira</a
     >
   </li>
