@@ -32,7 +32,7 @@ jobs:
 
         - name: Cleaning testing files
         run: |
-          cd SEUPROJETODJANGO/
+          cd cinema_app/
           rm db.sqlite3
           rm .env
           cd ..
@@ -41,10 +41,10 @@ jobs:
 
       - name: Zip artifact for deployment
         run: |
-          cd SEUPROJETODJANGO/
+          cd cinema_app/
           zip release.zip ./* -r
           cd ..
-          mv SEUPROJETODJANGO/release.zip .
+          mv cinema_app/release.zip .
 
       - name: Upload artifact for deployment jobs
         uses: actions/upload-artifact@v3
