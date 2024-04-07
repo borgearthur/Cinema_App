@@ -1,3 +1,4 @@
+
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 # More info on Python, GitHub Actions, and Azure App Service: https://aka.ms/python-webapps-actions
@@ -27,25 +28,15 @@ jobs:
           python -m venv venv
           source venv/bin/activate
       
-       - name: Install dependencies
-        run: pip install -r cinema_app/requirements.txt
+      - name: Install dependencies
+        run: pip install -r requirements.txt
 
-        - name: Cleaning testing files
-        run: |
-          cd cinema_app/
-          rm db.sqlite3
-          rm .env
-          cd ..
         
       # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
 
       - name: Zip artifact for deployment
-        run: |
-          cd cinema_app/
-          zip release.zip ./* -r
-          cd ..
-          mv cinema_app/release.zip .
-
+        run: zip release.zip ./* -r
+          
       - name: Upload artifact for deployment jobs
         uses: actions/upload-artifact@v3
         with:
@@ -76,9 +67,9 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v1
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_FA0C52E25F4949CAAC13CCA517498721 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_5753821838A14A69A36A9C3B824A19D2 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_8B5581D067EA46D4B82E7479DA2E7823 }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_25F85BF555E4423B8E73B70EB21CAC5A }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_C16CC7BFA87842ADBF38DD533E964E18 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_A4E54A7414EA408B949E9707ABA4D4E1 }}
 
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v2
