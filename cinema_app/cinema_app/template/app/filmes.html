@@ -1,0 +1,57 @@
+
+{% extends 'app/base.html' %}
+{% block css %}
+    <link rel="stylesheet" href="/static/css/reset.css">
+    <link rel="stylesheet" href="/static/css/list_style.css">
+    <script src="https://kit.fontawesome.com/f83d7a8359.js" crossorigin="anonymous"></script>
+{% endblock css %}
+{% block content %}
+
+
+<div class="search-content-master">
+    <h1>Estoque</h1>
+    <form method="GET" class="search-content">
+        <input type="text" name="search-area" class="search-field" value="{{ request.GET.search_area }}">
+        <button type="submit" class="search-btn"><i class="fa-solid fa-magnifying-glass"></i></button>
+    </form>
+    <button id="toggle-low-stock-btn">Estoque baixo</button>
+</div>
+<div class="left-content">
+    <div class="content-table">
+        <div class="table-head">
+            <p>Item</p>
+            <p>Quantidade</p>
+            <p>Preço</p>
+            <p>Categoria</p>
+            <p>Ações</p>
+        </div>
+        <div class="content">
+            {% for product in products %}
+                <div class="product">
+                    <p class="name">{{product.name}}</p>
+                    <p>{{product.quantity}}</p>
+                    <p>R${{product.price}}</p>
+                    <p class="category">{{product.category}}</p>
+                    <a class="look" href="{% url 'product' product.id %}">Ver</a>
+                </div>
+            {% endfor %}
+        </div>
+    </div>    
+</div>
+<div class="right-content">
+    {% if not products %}
+        <h2 class="no-products">Não encontramos nenhum produto.</h2>
+    {% endif %}
+    <a id="product-register" href="{% url 'product-create' %}">Cadastrar Produto</a>
+</div>
+
+<script>
+    const toggleLowStockBtn = document.getElementById('toggle-low-stock-btn');
+    toggleLowStockBtn.addEventListener('click', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const showLowStock = urlParams.get('show_low_stock') !== 'true';
+        urlParams.set('show_low_stock', showLowStock ? 'true' : 'false');
+        window.location.search = urlParams.toString();
+    });
+</script>
+{% endblock content %}

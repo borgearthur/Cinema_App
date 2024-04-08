@@ -8,7 +8,7 @@
 
 
 <section>
-    <a class="back" href="{% url 'products' %}">Voltar</a>
+    <a class="back" href="{% url 'filmes' %}">Voltar</a>
     <div class="container">
         <h1 class="title">Informações do Filme</h1>
         <form method="POST">
@@ -40,7 +40,7 @@
             <div class="form-group">
                 <label for="{{ form.genero.auto_id }}">Gênero:</label>
                 {{ form.genero }}
-                <label>Gostaria de um nova? <a class="genero" href="{% url 'create-genero' %}">Criar Novo Genero</a></label>
+                <label>Gostaria de um novo? <a class="genero" href="{% url 'create-genero' %}">Criar Novo Genero</a></label>
             </div>
             
             <button class="button" type="submit">Enviar</button>
