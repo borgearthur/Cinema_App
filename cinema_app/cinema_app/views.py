@@ -1,95 +1,118 @@
-
-from django.shortcuts import render, redirect, get_object_or_404
-from .models import *
-from django.http import HttpResponse
-from django.contrib.auth import authenticate, login, logout
+from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
+from .models import *
+from .forms import *
+from django.views import View
+from django.http import HttpResponse
 from django.contrib.auth.models import User
 
-def cadastro(request):
-    if request.method == 'POST':
-        username = request.POST['username']
-        name = request.POST['name']
-        email = request.POST['email']
-        password = request.POST['password']
+def getUser(req):
+    user = User.objects.get(username=req.user)
+    context = {"user": {"username": user.username,"email": user.email}}
+    return context
+
+
+class ViewFilme(View):
+    def get(self, req, id):
+        if req.user.is_authenticated:
+            context = getUser(req)
+            try:
+                filme = Filme.objects.get(pk=id)
+                review = filme.review_set.filter(user=req.user)
+
+                allReviews = filme.review_set.all().exclude(user=req.user)
+
+                context["allReviews"] = allReviews
+
+                if(review.exists()):
+                    context["review"] = review.first()
+
+                
+                context["filme"] = filme
+                
+               
+                try:
+                    user_review = Review.objects.get(user=req.user, filme=filme)
+                    context["user_review"] = user_review.text
+                except Review.DoesNotExist:
+                    context["user_review"] = None
+                return render(req, 'app/filme.html', context)
+            except Exception as e:
+                print("An error occurred:", e)
+                return redirect("app:root")
         
-        if User.objects.filter(username=username).exists():
-            return render(request, 'apps/cadastro.html', {"erro": "Usuário já existe"})
-        elif User.objects.filter(email=email).exists():
-            return render(request, 'apps/cadastro.html', {"erro": "Email já cadastrado"})
+        return redirect("autenticacao:signin")
 
-        user = User.objects.create_user(username=username, password=password, email=email, first_name=name)
-        login(request, user)
-        request.session["usuario"] = username
-        return redirect(home)
-        
-    return render(request, 'apps/cadastro.html')
-
-@login_required
-def cadastrar_espaco(request):
-    if request.method == 'POST':
-        proprietario_nome = request.POST['proprietario_nome']
-        nome = request.POST['nome']
-        descricao = request.POST['descricao']
-        preco_por_noite = request.POST['preco_por_noite']
-        endereco = request.POST['endereco']
-        cidade = request.POST['cidade']
-        estado = request.POST['estado']
-        pais = request.POST['pais']
-        numero_de_quartos = request.POST['numero_de_quartos']
-        numero_de_banheiros = request.POST['numero_de_banheiros']
-        numero_de_hospedes = request.POST['numero_de_hospedes']
-        foto_principal = request.FILES.get('foto_principal', None)
-
-        novo_espaco = Espaco(
-            proprietario_nome=proprietario_nome,
-            nome=nome,
-            descricao=descricao,
-            preco_por_noite=preco_por_noite,
-            endereco=endereco,
-            cidade=cidade,
-            estado=estado,
-            pais=pais,
-            numero_de_quartos=numero_de_quartos,
-            numero_de_banheiros=numero_de_banheiros,
-            numero_de_hospedes=numero_de_hospedes,
-            foto_principal=foto_principal
-        )
-        novo_espaco.save()
-
-        return redirect('detalhes_espaco', espaco_id=novo_espaco.id)
-    else:
-        return render(request, 'apps/cadastrar_espaco.html')
-def login(request):
-    if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
-        
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            login(request, user)
-            request.session["usuario"] = username
-            return redirect(home)
+    def post(self, req, id):
+        if req.POST.get("action") == "submit_review":
+            return self.criandoReview(req, id)
         else:
-            return render(request, 'apps/login.html', {"erro": "Usuário não encontrado"})
-    return render(request, 'apps/login.html')
+            return self.like_game(req, id)
 
-def logout(request):
-    logout(request)
-    if "usuario" in request.session:
-        del request.session["usuario"]
-    return redirect(home)
+    def criandoReview(self, req, id):
+        if req.user.is_authenticated:
+            try:
+                filme = Filme.objects.get(pk=id)
+                review_text = req.POST.get('textoDaReview')
+
+                existing_review = Review.objects.filter(user=req.user, filme=filme).first()
+
+                if existing_review:
+                    existing_review.text = review_text
+                    existing_review.save()
+                    return redirect(f"/app/review/{existing_review.id}")
+                
+                else:
+                    novaReview = Review(user=req.user, filme=filme, text=review_text)
+                    novaReview.save()
+
+                    return redirect(f"/app/review/{novaReview.id}")
+            except Filme.DoesNotExist:
+                return HttpResponse({"message": "Filme não encontrado"}, status=404)
+            
+        else:
+            return HttpResponse({"message": "Você precisa estar logado"}, status=400)
+
+class ReviewView(View):
+    def get(self, req, id):
+        if(req.user.is_authenticated):
+            context = getUser(req)
+
+            try:
+                review = Review.objects.get(pk=id)
+                game = review.game
+                print(game)
+
+                context["game"] = game
+                context["review"] = review
+
+                return render(req, "app/review.html", context)
+            except:
+                return redirect("app:root")
+            
+        return redirect("app:root")
 
 @login_required
-def meus_espacos(request):
-    espacos = Espaco.objects.filter(proprietario_nome=request.user.username)
-    return render(request, 'apps/meus_espacos.html', {'espacos': espacos})
+def criar_filme(request):
+    if request.method == 'POST':
+        form = FormFilme(request.POST, user=request.user)
+        if form.is_valid():
+            filme = form.save(commit=False)
+            filme.user = request.user
+            filme.save()
+            return redirect('products')
+    else:
+        form = FormFilme(user=request.user)
+    return render(request, 'app/product_form.html', {'form': form})
 
 @login_required
-def minhas_reservas(request):
-    reservas = Reserva.objects.filter(proprietario_nome=request.user.username)
-    return render(request, 'apps/minhas_reservas.html', {'reservas': reservas})
-
-def selecionar_espaco_para_reserva(request):
-    espacos = Espaco.objects.all()
-    return render(request, 'selecionar_espaco_para_reserva.html', {'espacos': espacos})
+def create_category(request):
+    error_message = ''
+    if request.method == 'POST':
+        form = FormGenero(request.POST)
+        if form.is_valid():
+            form.save(user=request.user)
+            return redirect('product-create')
+    else:
+        form = FormGenero()
+    return render(request, 'app/create_category.html', {'form':form})
