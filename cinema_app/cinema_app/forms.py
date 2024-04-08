@@ -22,7 +22,7 @@ class FormFilme(forms.ModelForm):
 class FormGenero(forms.ModelForm):
     class Meta:
         model = Genero
-        fields = ['nome']
+        fields = ['name']
 
     def save(self, commit=True, user=None):
         genero = super().save(commit=False)

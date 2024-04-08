@@ -74,6 +74,7 @@ else:
 # Application definition
 
 INSTALLED_APPS = [
+    'cinema_app.apps.CinemaAppConfig',
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",

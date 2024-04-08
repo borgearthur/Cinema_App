@@ -6,6 +6,13 @@ from django.views import View
 from django.http import HttpResponse
 from django.contrib.auth.models import User
 
+def home(request):
+    if request.user.is_authenticated:
+        return redirect('products')
+        
+    context = {'home': True}
+    return render(request, 'app/index.html', context)
+
 def getUser(req):
     user = User.objects.get(username=req.user)
     context = {"user": {"username": user.username,"email": user.email}}
