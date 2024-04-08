@@ -11,7 +11,7 @@ def home(request):
         return redirect('products')
         
     context = {'home': True}
-    return render(request, 'app/index.html', context)
+    return render(request, 'app/signin.html', context)
 
 def getUser(req):
     user = User.objects.get(username=req.user)

@@ -1,0 +1,37 @@
+
+{% extends 'bbase.html' %}
+{% load static %}
+
+{% block head %}
+    <link rel="stylesheet" href="{% static 'css/signin.css' %}">
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+{% endblock %}
+
+{% block body %}
+    <div class="content">
+        <div class="container-column full-height">
+            <div class="flex-1"></div>
+            <h1>Login</h1>
+            
+            <form class="flex-1" method="POST">
+                {% csrf_token %}
+                <input class="poppins-regular" placeholder="Usuário" type="text" name="username">
+                <input class="poppins-regular" placeholder="Senha" type="password" name="password">
+                <button class="poppins-semibold">Sign in</button>
+            </form>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="">
+                        {{message}}
+                    </div>
+                {% endfor %}
+            {% endif %}
+    
+            <div class="container-row flex-1">
+                <p class="poppins-medium tiny">Não possui uma conta?</p>
+                <a class="poppins-medium tiny link" href="{% url 'signup' %}">Cadastre-se</a>
+            </div>
+        </div>
+    </div>
+{% endblock %}
