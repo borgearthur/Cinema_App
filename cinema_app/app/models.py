@@ -19,7 +19,7 @@ class Filme (models.Model):
     nome = models.CharField(max_length=150, null=False, blank=False)
     duracao = models.PositiveIntegerField(null=False, blank=False)
     data_de_lancamento = models.DateTimeField(null=False, blank=False)
-    cartaz = models.FileField(upload_to='postee/')
+    cartaz = models.FileField(upload_to='poster/', )
     genero = models.ForeignKey(Genero, on_delete=models.SET_NULL, null=True, blank=True)
 
 
