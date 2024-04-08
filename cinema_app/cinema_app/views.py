@@ -10,12 +10,12 @@ from django.contrib.messages import constants
 
 def home(request):
     context = {'home': True}
-    return render(request, 'app/index.html', context)
+    return render(request, 'cinema_app/signin.html', context)
 
 class SignupView(View):
     def get(self, req):
         
-        return render(req, 'app/signup.html')
+        return render(req, 'cinema_app/signup.html')
 
     def post(self, req):
         username = req.POST.get('username')
@@ -30,7 +30,7 @@ class SignupView(View):
         else:
             if(password == ""):
                 messages.add_message(req, constants.ERROR, 'Insira uma senha válida')
-                return render(req, 'app/signup.html')
+                return render(req, 'cinema_app/signup.html')
             
             if(password != c_password):
                 messages.add_message(req, constants.ERROR, 'As senhas não são iguais!')
@@ -40,13 +40,13 @@ class SignupView(View):
 
                 return redirect('/')
 
-        return render(req, 'app/signup.html')
+        return render(req, 'cinema_app/signup.html')
 
 def filmes(req):
     if(req.user.is_authenticated):
-        return redirect('/app')
+        return redirect('/cinema_app')
     
-    return render(req, 'app/filmes.html')
+    return render(req, 'cinema_app/filmes.html')
 
 def getUser(req):
     user = User.objects.get(username=req.user)
@@ -78,12 +78,12 @@ class ViewFilme(View):
                     context["user_review"] = user_review.text
                 except Review.DoesNotExist:
                     context["user_review"] = None
-                return render(req, 'app/filme.html', context)
+                return render(req, 'cinema_app/filme.html', context)
             except Exception as e:
                 print("An error occurred:", e)
-                return redirect("app:root")
+                return redirect("cinema_app:root")
         
-        return redirect("autenticacao:signin")
+        return redirect("cinema_app:signin")
 
     def post(self, req, id):
         if req.POST.get("action") == "submit_review":
@@ -102,13 +102,13 @@ class ViewFilme(View):
                 if existing_review:
                     existing_review.text = review_text
                     existing_review.save()
-                    return redirect(f"/app/review/{existing_review.id}")
+                    return redirect(f"/cinema_app/review/{existing_review.id}")
                 
                 else:
                     novaReview = Review(user=req.user, filme=filme, text=review_text)
                     novaReview.save()
 
-                    return redirect(f"/app/review/{novaReview.id}")
+                    return redirect(f"/cinema_app/review/{novaReview.id}")
             except Filme.DoesNotExist:
                 return HttpResponse({"message": "Filme não encontrado"}, status=404)
             
@@ -128,11 +128,11 @@ class ReviewView(View):
                 context["game"] = game
                 context["review"] = review
 
-                return render(req, "app/review.html", context)
+                return render(req, "cinema_app/review.html", context)
             except:
-                return redirect("app:root")
+                return redirect("cinema_app:root")
             
-        return redirect("app:root")
+        return redirect("cinema_app:root")
 
 @login_required
 def criar_filme(request):
@@ -145,11 +145,10 @@ def criar_filme(request):
             return redirect('products')
     else:
         form = FormFilme(user=request.user)
-    return render(request, 'app/product_form.html', {'form': form})
+    return render(request, 'cinema_app/product_form.html', {'form': form})
 
 @login_required
 def create_category(request):
-    error_message = ''
     if request.method == 'POST':
         form = FormGenero(request.POST)
         if form.is_valid():
@@ -157,4 +156,4 @@ def create_category(request):
             return redirect('product-create')
     else:
         form = FormGenero()
-    return render(request, 'app/create_category.html', {'form':form})
+    return render(request, 'cinema_app/create_category.html', {'form':form})
