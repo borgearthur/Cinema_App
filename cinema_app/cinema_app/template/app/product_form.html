@@ -1,0 +1,51 @@
+{% extends 'app/base.html' %}
+
+{% block css %}
+<link rel="stylesheet" href="/static/css/product_form.css">
+{% endblock css %}
+
+{% block content %}
+
+
+<section>
+    <a class="back" href="{% url 'products' %}">Voltar</a>
+    <div class="container">
+        <h1 class="title">Informações do Filme</h1>
+        <form method="POST">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="{{ form.nome.auto_id }}">Título:</label>
+                {{ form.nome }}
+                {{ form.nome.errors }}
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.duracao.auto_id }}">Duração:</label>
+                {{ form.duracao }}
+                {{ form.duracao.errors }}
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.data_de_lancamento.auto_id }}">Data de Lançamento:</label>
+                {{ form.data_de_lancamento }}
+                {{ form.data_de_lancamento.errors }}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.cartaz.auto_id }}">Cartaz:</label>
+                {{ form.cartaz }}
+                {{ form.cartaz.errors }}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.genero.auto_id }}">Gênero:</label>
+                {{ form.genero }}
+                <label>Gostaria de um nova? <a class="genero" href="{% url 'create-genero' %}">Criar Novo Genero</a></label>
+            </div>
+            
+            <button class="button" type="submit">Enviar</button>
+            
+        </form>
+    </div>
+</section>
+{% endblock content %}

@@ -1,23 +1,40 @@
 from django.db import models
+from django.contrib.auth.models import User
+
+
+
+    
+class Genero(models.Model):
+    name = models.CharField(max_length=100)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+   
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        unique_together = ('name', 'user')
 
 class Filme (models.Model):
-    
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    nome = models.CharField(max_length=150, null=False, blank=False)
+    duracao = models.PositiveIntegerField(null=False, blank=False)
+    data_de_lancamento = models.DateTimeField(null=False, blank=False)
+    cartaz = models.FileField(upload_to='postee/')
+    genero = models.ForeignKey(Genero, on_delete=models.SET_NULL, null=True, blank=True)
+
+
+    def __str__(self) -> str:
+        return self.name
+
+class Alimento (models.Model):
     nome = models.CharField(max_length=200, null=False)
-    duração = models.DurationField()
-    data_de_lançamento = models.DateField()
-    cartaz = models.ImageField(upload_to='poster/')
+    preco = models.FloatField()
+    cartaz = models.FileField(upload_to='comida/')
 
-    class Meta:
-        app_label = 'cinema_app'
-        verbose_name_plural = 'Filmes'
+    def __str__(self):
+        return self.name
 
-class Horario(models.Model):
-    peso = models.FloatField(max_length=4, null=False)
-    altura = models.FloatField(max_length = 4, null=False)
-    restricao_alimentar = models.TextField(max_length = 100)
-    tdah = models.CharField(max_length = 4)
-    pcd = models.CharField(max_length = 4)
-
-    class Meta:
-        app_label = 'cinema_app'
-        verbose_name_plural = 'Horarios'
+class Review(models.Model):
+   user = models.ForeignKey(User, on_delete=models.CASCADE)
+   filme = models.ForeignKey(Filme, on_delete=models.CASCADE)
+   text = models.TextField(max_length=10000, default="minha Review legal!")
