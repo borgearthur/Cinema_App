@@ -1,4 +1,5 @@
 from django import urls
+from django.contrib import admin
 from django.urls import path
 from django.conf.urls.static import static
 from django.conf import settings
@@ -7,6 +8,7 @@ from . import views
 
 app_name = 'cinema_app'
 urlpatterns = [
+    path('admin/', admin.site.urls),
     path('', views.home, name = 'home'),
     path('alterar/', views.alterar_filmes, name="alterar"),
     path('criar/', views.criar_filmes, name='criar'), 
