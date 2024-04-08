@@ -1,0 +1,25 @@
+
+{% extends 'app/base.html' %}
+
+{% block css %}
+<link rel="stylesheet" href="/static/css/reset.css">
+<link rel="stylesheet" href="/static/css/create_category.css">
+{% endblock css %}
+
+{% block content %}
+<main>
+    <a class="back" href="{% url 'product-create' %}">Voltar</a>
+    <div class="container-form">
+        {% if error_message %}
+            <p>{{ error_message }}</p>
+        {% endif %}
+        <form method="post" class="form">
+            {% csrf_token %}
+            {{ form.as_p }}
+            
+            <button class="create-category" type="submit">Criar Categoria</button>
+        </form>
+    </div>
+</main>
+
+{% endblock content %}
