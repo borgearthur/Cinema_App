@@ -51,6 +51,9 @@ Esta plataforma é uma aplicação web com design adaptável que conecta donos d
 <img src = midia/Sprint_1.png>
 <img src = midia/Sprint_2.png>
 <img src = midia/Sprint_3.png>
+<p>Issue</p>
+<img src = "midia/Open Issue.png">
+<img src = "midia/Closed Issue.png">
 ## 👩‍💻 Membros
 
 <ul>
