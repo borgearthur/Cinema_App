@@ -48,9 +48,9 @@ Esta plataforma é uma aplicação web com design adaptável que conecta donos d
 <p>Backlog</p>
 <img src = midia/Backlog.png>
 <p>Sprint 1</p>
-<img src = midia/Sprint (1).png>
-<img src = midia/Sprint (2).png>
-<img src = midia/Sprint (3).png>
+<img src = midia/Sprint_1.png>
+<img src = midia/Sprint_2.png>
+<img src = midia/Sprint_3.png>
 ## 👩‍💻 Membros
 
 <ul>
