@@ -43,17 +43,14 @@ Esta plataforma é uma aplicação web com design adaptável que conecta donos d
       >Protótipo Lo-Fi</a
     >
   </li>
-  <li>
-    <a  href="https://lucid.app/lucidchart/9afc6f1f-7d40-4958-acab-ba836420aab8/edit?viewport_loc=-863%2C83%2C2458%2C1200%2C0_0&invitationId=inv_693e937f-6d9a-4e0d-b8cc-87bd1e806466  "
-      >Diagrama de Atividades</a
-    >
-  </li>
-  <li>
-    <a  href="https://appcinema.azurewebsites.net/"
-      >Clique aqui para ir no Site</a
-    >
-  </li>
 </ul>
+## 📷 Prints
+<p>Backlog</p>
+<img src = midia/Backlog.png>
+<p>Sprint 1</p>
+<img src = midia/Sprint_1.png>
+<img src = midia/Sprint_2.png>
+<img src = midia/Sprint_3.png>
 ## 👩‍💻 Membros
 
 <ul>
