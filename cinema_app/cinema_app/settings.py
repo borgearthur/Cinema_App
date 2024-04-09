@@ -74,6 +74,7 @@ else:
 # Application definition
 
 INSTALLED_APPS = [
+    'cinema_app.apps.CinemaAppConfig',
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -81,7 +82,6 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "whitenoise.runserver_nostatic",
-    'cinema_app',
 ]
 
 MIDDLEWARE = [
@@ -100,7 +100,9 @@ ROOT_URLCONF = 'cinema_app.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['cinema_app'],
+        'DIRS': [
+            os.path.join(BASE_DIR, 'cinema_app/template'),
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
