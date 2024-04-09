@@ -10,7 +10,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home, name = 'home'),
     path('signup/', views.SignupView.as_view(), name='signup'),
-    path('search/', views.Search.as_view(), name='search'),
+    path('/search/', views.Search.as_view(), name='search'),
     path('filme/<int:id>', views.ViewFilme.as_view(), name='filme'),
     path('review/<int:id>/', views.ReviewView.as_view(), name='review'),
     path('criar/', views.criar_filme, name='criar'), 
