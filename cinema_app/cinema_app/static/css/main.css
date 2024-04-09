@@ -64,3 +64,31 @@ body {
 .nav-link.login:hover {
     background-color: #c82333;
 }
+
+:root {
+    --background: #181818;
+    --zinc: #E0E0E0;
+}
+
+html {
+    font-size: 16px;
+}
+
+body{
+    background-color: var(--background);
+    color: var(--zinc);
+    margin: 0;
+    box-sizing: border-box;
+    padding: 40px;
+    display: flex;
+    width: 100%;
+    min-height: 100vh;
+    height: 100vh;
+    flex-direction: column;
+    overflow-x: hidden;
+    gap: 3rem;
+}
+
+.disabled {
+    opacity: 50%;
+}

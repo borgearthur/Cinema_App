@@ -8,9 +8,11 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.messages import constants
 
-def home(request):
-    context = {'home': True}
-    return render(request, 'cinema_app/signin.html', context)
+def home(req):
+    if(req.user.is_authenticated):
+        return render(req, 'cinema_app/home_user.html')
+        
+    return render(req, 'cinema_app/signin.html')
 
 class SignupView(View):
     def get(self, req):
@@ -83,13 +85,13 @@ class ViewFilme(View):
                 print("An error occurred:", e)
                 return redirect("cinema_app:root")
         
-        return redirect("cinema_app:signin")
+        return render(req, "cinema_app/signin")
 
     def post(self, req, id):
         if req.POST.get("action") == "submit_review":
             return self.criandoReview(req, id)
         else:
-            return self.like_game(req, id)
+            return self.like_filme(req, id)
 
     def criandoReview(self, req, id):
         if req.user.is_authenticated:
@@ -114,6 +116,21 @@ class ViewFilme(View):
             
         else:
             return HttpResponse({"message": "Você precisa estar logado"}, status=400)
+        
+class Search(View):
+    def get(self, req):
+        if(req.user.is_authenticated):
+            context = getUser(req)
+            
+            searchTerm = req.GET.get("search")
+
+            filmes = Filme.objects.all().filter(name__icontains=searchTerm)
+
+            context["filmes"] = filmes
+
+            return render(req, 'cinema_app/search.html', context)
+        
+        return render(req, 'cinema_app/signin.html')
 
 class ReviewView(View):
     def get(self, req, id):
@@ -122,17 +139,17 @@ class ReviewView(View):
 
             try:
                 review = Review.objects.get(pk=id)
-                game = review.game
-                print(game)
+                filme = review.filme
+                print(filme)
 
-                context["game"] = game
+                context["filme"] = filme
                 context["review"] = review
 
                 return render(req, "cinema_app/review.html", context)
             except:
-                return redirect("cinema_app:root")
+                return redirect("app:root")
             
-        return redirect("cinema_app:root")
+        return redirect("app:root")
 
 @login_required
 def criar_filme(request):
