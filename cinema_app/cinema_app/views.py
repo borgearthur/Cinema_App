@@ -1,10 +1,80 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from .models import *
-from .forms import *
-from django.views import View
-from django.http import HttpResponse
-from django.contrib.auth.models import User
+
+def home(request):
+    filmes = Filme.objects.all()
+    alimentos = Alimento.objects.all()
+    return render(request, 'home.html', {'filmes': filmes}, {'alimentos': alimentos})
+
+def detalhes_filme(request, filme_id):
+    if request.user.is_authenticated:
+        filme = get_object_or_404(Filme, id=filme_id)
+        usuario = request.user
+        favorito = Favorito.objects.filter(usuario=usuario, filme=filme).exists()
+        detalhes_filme = filme.detalhes()
+        return render(request, 'detalhes_filme.html', {'filme': filme, 'detalhes_filme': detalhes_filme, 'favorito':favorito})
+    else:
+        filme = get_object_or_404(Filme, id=filme_id)
+        detalhes_filme = filme.detalhes()
+        return render(request, 'detalhes_filme.html', {'filme': filme, 'detalhes_filme': detalhes_filme})
+    
+
+def detalhes_alimento(request, alimento_id):
+    if request.user.is_authenticated:
+        alimento = get_object_or_404(Alimento, id=alimento_id)
+        usuario = request.user
+        favorito = Favorito.objects.filter(usuario=usuario, alimento=alimento).exists()
+        detalhes_alimento = alimento.detalhes()
+        return render(request, 'detalhes_alimento.html', {'alimento': alimento, 'detalhes_alimento': detalhes_alimento, 'favorito':favorito})
+    else:
+        alimento = get_object_or_404(Alimento, id=alimento_id)
+        detalhes_alimento = alimento.detalhes()
+        return render(request, 'detalhes.html', {'alimento': alimento, 'detalhes_alimento': detalhes_alimento})
+
+@login_required
+def favoritar_filme(request, filme_id):
+    filme = get_object_or_404(Filme, id=filme_id)
+    
+    if request.method == 'POST' or request.method == 'GET':
+        usuario = request.user
+        
+        favorito_existente = Favorito.objects.filter(usuario=usuario, filme=filme).exists()
+        
+        if not favorito_existente:
+            Favorito.objects.create(usuario=usuario, filme=filme)
+        else:
+            favorito = Favorito.objects.filter(usuario=usuario, filme=filme).first()
+            favorito.delete()       
+        return redirect('favoritos')
+    
+    return redirect('home')
+
+@login_required
+def favoritar_alimento(request, alimento_id):
+    alimento = get_object_or_404(Filme, id=alimento_id)
+    
+    if request.method == 'POST' or request.method == 'GET':
+        usuario = request.user
+        
+        favorito_existente = Favorito.objects.filter(usuario=usuario, alimento=alimento).exists()
+        
+        if not favorito_existente:
+            Favorito.objects.create(usuario=usuario, alimento=alimento)
+        else:
+            favorito = Favorito.objects.filter(usuario=usuario, alimento=alimento).first()
+            favorito.delete()       
+        return redirect('favoritos')
+    
+    return redirect('home')
+
+@login_required
+def lista_favoritos(request):
+    if request.user.is_authenticated:
+        favoritos = Favorito.objects.filter(usuario=request.user)
+        return render(request, 'favoritos.html', {'favoritos': favoritos})
+    else:
+        return redirect('login')
 
 def getUser(req):
     user = User.objects.get(username=req.user)
