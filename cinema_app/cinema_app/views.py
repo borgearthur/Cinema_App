@@ -1,6 +1,15 @@
-from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect, get_object_or_404
 from .models import *
+from django.http import HttpResponseRedirect
+from django.core.mail import send_mail
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+from django.urls import reverse
+from django.core.exceptions import ValidationError 
+from django.contrib.auth.hashers import make_password
+from django.core.exceptions import ObjectDoesNotExist
+
 
 def home(request):
     filmes = Filme.objects.all()
@@ -30,7 +39,7 @@ def detalhes_alimento(request, alimento_id):
     else:
         alimento = get_object_or_404(Alimento, id=alimento_id)
         detalhes_alimento = alimento.detalhes()
-        return render(request, 'detalhes.html', {'alimento': alimento, 'detalhes_alimento': detalhes_alimento})
+        return render(request, 'detalhes_alimento.html', {'alimento': alimento, 'detalhes_alimento': detalhes_alimento})
 
 @login_required
 def favoritar_filme(request, filme_id):
@@ -76,113 +85,137 @@ def lista_favoritos(request):
     else:
         return redirect('login')
 
-def getUser(req):
-    user = User.objects.get(username=req.user)
-    context = {"user": {"username": user.username,"email": user.email}}
-    return context
-
-
-class ViewFilme(View):
-    def get(self, req, id):
-        if req.user.is_authenticated:
-            context = getUser(req)
-            try:
-                filme = Filme.objects.get(pk=id)
-                review = filme.review_set.filter(user=req.user)
-
-                allReviews = filme.review_set.all().exclude(user=req.user)
-
-                context["allReviews"] = allReviews
-
-                if(review.exists()):
-                    context["review"] = review.first()
-
-                
-                context["filme"] = filme
-                
-               
-                try:
-                    user_review = Review.objects.get(user=req.user, filme=filme)
-                    context["user_review"] = user_review.text
-                except Review.DoesNotExist:
-                    context["user_review"] = None
-                return render(req, 'app/filme.html', context)
-            except Exception as e:
-                print("An error occurred:", e)
-                return redirect("app:root")
+def login_view(request):
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        password = request.POST.get('password')
         
-        return redirect("autenticacao:signin")
+        try:
+            username = User.objects.get(email=email).username
+        except ObjectDoesNotExist:
+            return render(request, 'login.html', {'error': 'Usuário não encontrado'})
 
-    def post(self, req, id):
-        if req.POST.get("action") == "submit_review":
-            return self.criandoReview(req, id)
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            return redirect('home')
         else:
-            return self.like_game(req, id)
+            return render(request, 'login.html', {'error': 'Usuário ou senha inválidos'})
+    return render(request, 'login.html')
 
-    def criandoReview(self, req, id):
-        if req.user.is_authenticated:
-            try:
-                filme = Filme.objects.get(pk=id)
-                review_text = req.POST.get('textoDaReview')
+def logout(request):
+    logout(request)
+    if "usuario" in request.session:
+        del request.session["usuario"]
+    return redirect(home)
 
-                existing_review = Review.objects.filter(user=req.user, filme=filme).first()
-
-                if existing_review:
-                    existing_review.text = review_text
-                    existing_review.save()
-                    return redirect(f"/app/review/{existing_review.id}")
-                
-                else:
-                    novaReview = Review(user=req.user, filme=filme, text=review_text)
-                    novaReview.save()
-
-                    return redirect(f"/app/review/{novaReview.id}")
-            except Filme.DoesNotExist:
-                return HttpResponse({"message": "Filme não encontrado"}, status=404)
-            
-        else:
-            return HttpResponse({"message": "Você precisa estar logado"}, status=400)
-
-class ReviewView(View):
-    def get(self, req, id):
-        if(req.user.is_authenticated):
-            context = getUser(req)
-
-            try:
-                review = Review.objects.get(pk=id)
-                game = review.game
-                print(game)
-
-                context["game"] = game
-                context["review"] = review
-
-                return render(req, "app/review.html", context)
-            except:
-                return redirect("app:root")
-            
-        return redirect("app:root")
-
-@login_required
-def criar_filme(request):
+def cadastro_filme(request):
     if request.method == 'POST':
-        form = FormFilme(request.POST, user=request.user)
-        if form.is_valid():
-            filme = form.save(commit=False)
-            filme.user = request.user
+        email = request.POST.get('email')
+        senha = request.POST.get('senha')
+        confirmar_senha = request.POST.get('confirmar_senha')
+
+        if senha != confirmar_senha:
+            return render(request, 'cadastro_filme.html', {'form': request.POST})
+
+        if User.objects.filter(email=email).exists():
+            return render(request, 'cadastro_filme.html', {'form': request.POST})
+
+        senha_criptografada = make_password(senha)
+        username = request.POST.get('username')
+        nome_filme = request.POST.get('nome_filme')
+        descricao = request.POST.get('descricao')
+        duracao = request.POST.get('duracao')
+
+        filme = Filme(
+            username=username,
+            nome_filme=nome_filme,
+            descricao=descricao,
+            email=email,
+            duracao=duracao,
+            senha=senha_criptografada,
+        )
+
+        if 'foto_filme' in request.FILES:
+            filme.cartaz = request.FILES['foto_filme']
+
+        try:
+            filme.full_clean()
             filme.save()
-            return redirect('products')
-    else:
-        form = FormFilme(user=request.user)
-    return render(request, 'app/product_form.html', {'form': form})
+        except ValidationError:
+            return render(request, 'cadastro_filme.html', {'form': request.POST})
 
-@login_required
-def create_category(request):
-    error_message = ''
+        user = User.objects.create_user(password=senha, email=email, first_name=username)
+        login(request, user)
+        request.session["usuario"] = email 
+
+        return redirect('home') 
+
+    return render(request, 'cadastro_filme.html')
+
+def cadastro_alimento(request):
     if request.method == 'POST':
-        form = FormGenero(request.POST)
-        if form.is_valid():
-            form.save(user=request.user)
-            return redirect('product-create')
-    else:
-        form = FormGenero()
-    return render(request, 'app/create_category.html', {'form':form})
+        email = request.POST.get('email')
+        senha = request.POST.get('senha')
+        confirmar_senha = request.POST.get('confirmar_senha')
+
+        if senha != confirmar_senha:
+            return render(request, 'cadastro_alimento.html', {'form': request.POST})
+
+        if User.objects.filter(email=email).exists():
+            return render(request, 'cadastro_alimento.html', {'form': request.POST})
+
+        senha_criptografada = make_password(senha)
+        username = request.POST.get('username')
+        nome_alimento = request.POST.get('nome_alimento')
+        descricao = request.POST.get('descricao')
+        preco = request.POST.get('preco')
+
+        alimento = Alimento(
+            username=username,
+            nome_alimento=nome_alimento,
+            descricao=descricao,
+            email=email,
+            preco=preco,
+            senha=senha_criptografada,
+        )
+
+        if 'foto_comida' in request.FILES:
+            alimento.cartaz = request.FILES['foto_comida']
+
+        try:
+            alimento.full_clean()
+            alimento.save()
+        except ValidationError:
+            return render(request, 'cadastro_alimento.html', {'form': request.POST})
+
+        user = User.objects.create_user(password=senha, email=email, first_name=username)
+        login(request, user)
+        request.session["usuario"] = email 
+
+        return redirect('home') 
+
+    return render(request, 'cadastro_alimento.html')
+
+def UserCadastro(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        name = request.POST['name']
+        email = request.POST['email']
+        password = request.POST['password']
+        confirm_password = request.POST.get('confirm_password')
+
+        if password != confirm_password:
+                return render(request, 'cadastro_usuario.html', {'form': request.POST})
+        
+        if User.objects.filter(username=username).exists():
+            return render(request, 'cadastro_usuario.html', {"erro": "Usuário já existe"})
+        if User.objects.filter(email=email).exists():
+            return render(request, 'cadastro_usuario.html', {"erro": "Email já cadastrado"})
+
+        user = User.objects.create_user(username=username, password=password, email=email, first_name=name)
+        login(request, user)
+        request.session["usuario"] = email
+        return redirect('cadastro_user_sucesso')
+        
+    return render(request, 'cadastro_usuario.html')
