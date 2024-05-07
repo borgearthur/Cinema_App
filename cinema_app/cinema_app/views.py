@@ -1,11 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import *
-from django.http import HttpResponseRedirect
-from django.core.mail import send_mail
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.urls import reverse
 from django.core.exceptions import ValidationError 
 from django.contrib.auth.hashers import make_password
 from django.core.exceptions import ObjectDoesNotExist
