@@ -1,111 +1,193 @@
-{% load static %}
-<style>
-    @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz@12..96&display=swap');
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Minhas Cafeterias</title>
+    {% load static %}
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz@12..96&display=swap');
 
-    :root {
-
-        --branco-principal: #F7F7FC;
-        --cor-principal: #902C00;
-        --preto-principal:#1D1D1B;
-        --branco-navbar:#FFFFFF;
-        --branco-fundo: #F9F9F9;;
-        --cor-glass-login-cadastro: #F9F9F9;
-        --cor-botoes:#A75938;
+        :root {
+        --branco-principal: white;
+        --cor-principal: darkgreen;
+        --preto-principal:black;
+        --branco-navbar:white;
+        --branco-fundo: white;
+        --cor-glass-login-cadastro: white;
+        --cor-botoes:darkorange;
         --fonte-principal: 'Bricolage Grotesque';
-    }
-    * {
-        margin: 0;
-        padding: 0;
-        font-family: 'Bricolage Grotesque', sans-serif;
-        font-weight: bold;
-    }
+        }
 
-    header {
+        * {
+            margin: 0;
+            padding: 0;
+            font-family: 'Bricolage Grotesque', sans-serif;
+            font-weight: bold;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--branco-navbar);
+            padding: 10px 20px;
+            position: relative;
+            box-shadow: rgba(0, 0, 0, 0.2) 0.5px 3px 2.6px;
+        }
+
+        .div-logo a img {
+            height: 70px;
+            vertical-align: middle;
+        }
+
+        .logo-titulo{
+            padding-top: 20px;
+            display: none;
+            font-weight: lighter;
+            color: var(--preto-principal);
+            text-decoration-line: none;
+            vertical-align:auto;
+
+        }
+        .div-logo:hover .logo-titulo {
+            display: inline-block;
+        }   
+        .dropdown {
+            position: relative;
+            display: inline-block;
+            margin-right: 40px;
+        }
+
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            background-color: var(--cor-principal);
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+            border-radius: 20px;
+            padding: 10px;
+        }
+
+        .dropdown-menu a,
+        button {
+            font-weight: lighter;
+            color: #FFFFFF;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .dropdown:hover .dropdown-menu {
+            display: block;
+        }
+
+        .dropdown button {
+            background-color: var(--cor-principal);
+            color: white;
+            border: none;
+            cursor: pointer;
+            padding: 10px;
+            margin-right: 40px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .dropdown button img {
+            margin-left: 10px;
+            height: 20px;
+        }
+
+        .button-sair {
+            background-color: transparent;
+            font-size: 17px;
+            padding: 0;
+            cursor: pointer;
+        }
+
+    .search-form .input-group {
+        width: 70%;
         display: flex;
-        justify-content: space-between;
         align-items: center;
-        background-color: var(--branco-navbar);
-        padding: 10px 20px;
-        position: relative;
-        box-shadow: rgba(0, 0, 0, 0.2) 0.5px 3px 2.6px;
+        margin: 0 auto;
     }
 
-    .div-logo a img {
-        height: 50px;
-    }
-
-    .dropdown {
-        position: relative;
-        display: inline-block;
-        margin-right: 40px;
-    }
-
-    .dropdown-menu {
-        display: none;
-        position: absolute;
-        background-color: var(--cor-principal);
-        min-width: 160px;
-        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-        z-index: 1;
-        border-radius: 20px;
-        padding: 10px;
-    }
-
-    .dropdown-menu a, button {
-        font-weight: lighter;
-        color: #FFFFFF;
-        padding: 12px 16px;
-        text-decoration: none;
-        display: block;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-    }
-
-    .dropdown:hover .dropdown-menu {
-        display: block;
-    }
-
-    .dropdown button {
-        background-color: var(--cor-principal);
-        color: #FFFFFF;
-        border: none;
-        cursor: pointer;
-        padding: 10px;
-        margin-right: 40px;
-        border-radius: 20px;
-        display: flex;
-        align-items: center;
-    }
-
-    .dropdown button img {
-        margin-left: 10px;
-        height: 20px;
-    }
-
-    .button-sair {
-
-    font-size: 17px;
-    padding: 0;
+.search-input {
+    border-radius: 10px;
+    border: none;
+    padding: 10px;
+    flex-grow: 1; /* Faz o input crescer e ocupar todo o espaço disponível, excluindo o espaço do ícone/button */
+    padding-right: 30px; /* Espaço para não sobrepor o ícone */
 }
 
-</style>
+.input-group-append {
+    margin-left: -40px; /* Posiciona o ícone/button dentro do campo de input */
+}
+
+.search-icon {
+    z-index: 2;
+    color: #ccc;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+    </style>
 </head>
 <body>
-<header>
-    <div class="div-logo">
-        <a href="{% url 'home' %}">
-            <img src="{% static 'images/logo.png' %}" alt="Logo">
+    <header style="background-color: var(--cor-botoes);">
+        <div class="div-logo">
+            {% if user.is_authenticated %}
+            {% if user.usercliente.is_business %}
+        <a href="{% url 'cafeterias_empresarios' %}">
+            {% else %}
+            <a href="{% url 'home' %}">
+                {% endif %}
+            {% else %}
+            <a href="{% url 'home' %}">
+                {% endif %}
+            <h1>
+            <img class="logo" src="{% static 'images/cinema-logo.jpg' %}" alt="Cinema App">
+            <div class="logo-titulo">Cinema App</div></h1>
         </a>
     </div>
+    {% if mensagem_alerta %}
+<div class="container">
+    <div class="alert alert-info" role="alert">
+        {{ mensagem_alerta }}
+    </div>
+</div>
+{% endif %}
+
+    
+<form action="{% url 'buscar_cafeterias' %}" method="GET" class="search-form">
+        <div class="row" style="justify-content: center;">
+            <div class="col-md-7" > <!-- Ajustado para maior largura -->
+                <div class="input-group mb-2" style="margin-right: 250px;">
+                    <input type="text" class="form-control search-input" placeholder="Buscar filmes..." name="termo" id="search-input">
+                    <div class="input-group-append">
+                        <button class="btn search-icon" type="submit">
+                            <i class="fas fa-search" id="search-icon"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+</form>
     <div class="dropdown">
         <button>
             <img src="{% static 'images/menu_icone.png' %}" alt="Menu">
             <img src="{% static 'images/menu_user.png' %}" alt="User">
         </button>
         <div class="dropdown-menu">
-            <a href="{% url 'minhas_reservas' %}">Minhas reservas</a>
-            <a href="{% url 'cadastro_cafeteria' %}">Cadastre sua cafeteria</a>
             <a href="{% url 'favoritos' %}">Favoritos</a>
             <a href="{% url 'historico' %}">Histórico</a>
+            <a href="{% url 'minhas_compras' %}">Compras</a>
+            {% if user.usercliente.is_business %}
+            <a href="{% url 'cafeterias_empresarios' %}">Meus filmes</a>
+            <a href="{% url 'cadastro_cafeteria' %}">Cadastre seu filme</a>
+            {% endif %}
             {% if user.is_authenticated %}
             <form method="POST" action="{% url 'perfil_usuario' %}">
                 {% csrf_token %}
@@ -121,3 +203,15 @@
         </div>
     </div>
 </header>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('search-input');
+        const searchIcon = document.getElementById('search-icon');
+    
+        searchInput.addEventListener('input', function() {
+            // Muda a cor da lupa com base na presença de texto
+            searchIcon.style.color = searchInput.value.trim() ? '#333' : '#ccc';
+        });
+    });
+    </script>

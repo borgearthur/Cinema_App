@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import *
-from .models import Cafe, Avaliacao, UserCliente
+from .models import Filme, Avaliacao, UserCliente
 from datetime import datetime
 from django.http import HttpResponseRedirect
 from django.core.mail import send_mail
@@ -20,13 +20,13 @@ from django.core.files.storage import FileSystemStorage
 import random
 
 def home(request):
-    cafes = Cafe.objects.all()
-    return render(request, 'home.html', {'cafes': cafes})
+    filmes = Filme.objects.all()
+    return render(request, 'home.html', {'filmes': filmes})
 
 def buscar_cafeterias(request):
     if 'termo' in request.GET:
         termo = request.GET['termo']
-        resultados = Cafe.objects.filter(Q(nome_cafeteria__icontains=termo) | Q(descricao__icontains=termo))
+        resultados = Filme.objects.filter(Q(nome_cafeteria__icontains=termo) | Q(descricao__icontains=termo))
         if resultados:
             return render(request, 'resultado_busca.html', {'resultados': resultados, 'termo': termo})
         else:
@@ -80,16 +80,16 @@ def cadastro_cafeteria(request):
         if not cnpj.isdigit() or len(cnpj) != 14:
             return render(request, 'cadastro_cafeteria.html', {"erro": "O CNPJ deve conter apenas números e ter 14 dígitos."})
 
-        if Cafe.objects.filter(whatsapp=whatsapp).exists():
+        if Filme.objects.filter(whatsapp=whatsapp).exists():
             return render(request, 'cadastro_cafeteria.html', {"erro": "O número de WhatsApp já está em uso."})
 
-        if Cafe.objects.filter(cnpj=cnpj).exists():
+        if Filme.objects.filter(cnpj=cnpj).exists():
             return render(request, 'cadastro_cafeteria.html', {"erro": "O CNPJ já está em uso."})
         
         if foto_ambiente in request.FILES:
-            cafe.foto_ambiente = request.FILES['foto_ambiente']
+            Filme.foto_ambiente = request.FILES['foto_ambiente']
 
-        cafe = Cafe(
+        filme = filme(
             responsavel=responsavel,
             nome_cafeteria=nome_cafeteria,
             endereco=endereco,
@@ -104,10 +104,10 @@ def cadastro_cafeteria(request):
         )
 
         if 'foto_ambiente' in request.FILES:
-            cafe.foto_ambiente = request.FILES['foto_ambiente']
+            Filme.foto_ambiente = request.FILES['foto_ambiente']
 
-        cafe.full_clean()
-        cafe.save()
+        Filme.full_clean()
+        Filme.save()
         return redirect('cadastro_cafeteria_sucesso')
 
     return render(request, 'cadastro_cafeteria.html')
@@ -119,187 +119,187 @@ def cadastro_user_sucesso(request):
     return render(request, 'cadastro_user_sucesso.html')
 
 @login_required
-def cancelar_reserva(request, reserva_id):
-    reserva = get_object_or_404(ReservaCafe, id=reserva_id, cliente__email=request.user.email)
+def cancelar_compra(request, compra_id):
+    compra = get_object_or_404(Compra, id=compra_id, cliente__email=request.user.email)
 
     if request.method == 'POST':
-        reserva.delete()
-        messages.success(request, 'Reserva cancelada com sucesso.')
-        return redirect('minhas_reservas')
+        compra.delete()
+        messages.success(request, 'Compra cancelada com sucesso.')
+        return redirect('minhas_compras')
     
-    return render(request, 'apps/cancelar_reserva.html', {'reserva': reserva})
+    return render(request, 'apps/cancelar_reserva.html', {'compra': compra})
 
 @login_required
-def criar_reserva(request, cafe_id):
-    cafe = get_object_or_404(Cafe, id=cafe_id)
+def criar_compra(request, filme_id):
+    filme = get_object_or_404(Filme, id=filme_id)
     cliente = get_object_or_404(UserCliente, email=request.user.email)
     
     if request.method == 'POST':
         nome_cliente = request.POST.get('nome_cliente')
-        data_reserva = request.POST.get('data_reserva')
-        horario_reserva = request.POST.get('horario_reserva')
+        data_compra = request.POST.get('data_compra')
+        horario_compra = request.POST.get('horario_compra')
         numero_de_pessoas = int(request.POST.get('numero_de_pessoas', 1))
         observacao = request.POST.get('observacao', '')
 
-        if not nome_cliente or not data_reserva or not horario_reserva:
-            return render(request, 'reservar_cafe.html', {
-                'cafe': cafe,
+        if not nome_cliente or not data_compra or not horario_compra:
+            return render(request, 'comprar_Filme.html', {
+                'filme': filme,
                 'error_message': 'Por favor, preencha todos os campos obrigatórios.'
             })
 
         try:
-            data_reserva = datetime.strptime(data_reserva, '%Y-%m-%d').date()
-            horario_reserva = datetime.strptime(horario_reserva, '%H:%M').time()
+            data_compra = datetime.strptime(data_compra, '%Y-%m-%d').date()
+            horario_compra = datetime.strptime(horario_compra, '%H:%M').time()
         except ValueError:
-            return render(request, 'reservar_cafe.html', {
-                'cafe': cafe,
+            return render(request, 'comprar_Filme.html', {
+                'filme': filme,
                 'error_message': 'Formato de data ou horário inválido.'
             })
 
         today_date = datetime.today().date()
-        if data_reserva < today_date:
-            return render(request, 'reservar_cafe.html', {
-                'cafe': cafe,
+        if data_compra < today_date:
+            return render(request, 'comprar_Filme.html', {
+                'filme': filme,
                 'error_message': 'A data selecionada deve ser futura.'
             })
 
         if numero_de_pessoas <= 0:
-            return render(request, 'reservar_cafe.html', {
-                'cafe': cafe,
+            return render(request, 'comprar_Filme.html', {
+                'filme': filme,
                 'error_message': 'O número de pessoas deve ser maior que zero.'
             })
 
-        reservas_conflitantes = ReservaCafe.objects.filter(
-            cafe=cafe,
-            data_reserva=data_reserva,
-            horario_reserva=horario_reserva
+        compras_conflitantes = compraFilme.objects.filter(
+            filme=filme,
+            data_compra=data_compra,
+            horario_compra=horario_compra
         )
 
-        if reservas_conflitantes.exists():
-            return render(request, 'reservar_cafe.html', {
-                'cafe': cafe,
-                'error_message': 'Café já reservado para o horário solicitado!'
+        if compras_conflitantes.exists():
+            return render(request, 'comprar_Filme.html', {
+                'filme': filme,
+                'error_message': 'Café já comprado para o horário solicitado!'
             })
 
-        reserva = ReservaCafe(
-            cafe=cafe,
+        compra = comprafilme(
+            filme=filme,
             cliente=cliente,
-            data_reserva=data_reserva,
-            horario_reserva=horario_reserva,
+            data_compra=data_compra,
+            horario_compra=horario_compra,
             numero_de_pessoas=numero_de_pessoas,
             observacao=observacao
         )
-        reserva.save()
+        compra.save()
         
-        messages.success(request, 'Reserva efetuada com sucesso.')
-        return redirect('minhas_reservas')
+        messages.success(request, 'compra efetuada com sucesso.')
+        return redirect('minhas_compras')
     
     else:
-        reservas = ReservaCafe.objects.filter(cafe=cafe).values('data_reserva', 'horario_reserva')
-        horarios_reservados = {}
-        for reserva in reservas:
-            data_str = reserva['data_reserva'].strftime('%Y-%m-%d')
-            horario_str = reserva['horario_reserva'].strftime('%H:%M')
-            if data_str not in horarios_reservados:
-                horarios_reservados[data_str] = []
-            horarios_reservados[data_str].append(horario_str)
+        compras = compraFilme.objects.filter(filme=filme).values('data_compra', 'horario_compra')
+        horarios_comprados = {}
+        for compra in compras:
+            data_str = compra['data_compra'].strftime('%Y-%m-%d')
+            horario_str = compra['horario_compra'].strftime('%H:%M')
+            if data_str not in horarios_comprados:
+                horarios_comprados[data_str] = []
+            horarios_comprados[data_str].append(horario_str)
 
-        return render(request, 'reservar_cafe.html', {
-            'cafe': cafe,
-            'horarios_reservados_json': json.dumps(horarios_reservados)
+        return render(request, 'comprar_Filme.html', {
+            'filme': filme,
+            'horarios_comprados_json': json.dumps(horarios_comprados)
     })
 
-def detalhes_anonimo(request, cafe_id):
-        cafe = get_object_or_404(Cafe, id=cafe_id)
-        detalhes_cafe = cafe.detalhes()
+def detalhes_anonimo(request, filme_id):
+        filme = get_object_or_404(filme, id=filme_id)
+        detalhes_filme = Filme.detalhes()
 
-        outras_cafeterias = list(Cafe.objects.exclude(id=cafe_id))
+        outras_cafeterias = list(Filme.objects.exclude(id=filme_id))
         random.shuffle(outras_cafeterias)
         outras_cafeterias = outras_cafeterias[:4]
 
-        return render(request, 'detalhes.html', {'cafe': cafe, 'detalhes_cafe': detalhes_cafe, 'outras_cafeterias': outras_cafeterias})
+        return render(request, 'detalhes.html', {'filme': filme, 'detalhes_filme': detalhes_filme, 'outras_cafeterias': outras_cafeterias})
 
 @login_required
-def editar_reserva(request, reserva_id):
-    reserva = get_object_or_404(ReservaCafe, id=reserva_id)
-    cafe = reserva.cafe
+def editar_compra(request, compra_id):
+    compra = get_object_or_404(comprafilme, id=compra_id)
+    filme = compra.filme
     
     if request.method == 'POST':
         nome_cliente = request.POST.get('nome_cliente')
-        data_reserva = request.POST.get('data_reserva')
-        horario_reserva = request.POST.get('horario_reserva')
+        data_compra = request.POST.get('data_compra')
+        horario_compra = request.POST.get('horario_compra')
         numero_de_pessoas = int(request.POST.get('numero_de_pessoas', 1))
         observacao = request.POST.get('observacao', '')
 
-        if not nome_cliente or not data_reserva or not horario_reserva:
+        if not nome_cliente or not data_compra or not horario_compra:
             return render(request, 'editar_reserva.html', {
-                'reserva': reserva,  'cafe':cafe,
+                'compra': compra,  'filme':filme,
                 'error_message': 'Por favor, preencha todos os campos obrigatórios.'
             })
 
         try:
-            data_reserva = datetime.strptime(data_reserva, '%Y-%m-%d').date()
-            horario_reserva = datetime.strptime(horario_reserva, '%H:%M').time()
+            data_compra = datetime.strptime(data_compra, '%Y-%m-%d').date()
+            horario_compra = datetime.strptime(horario_compra, '%H:%M').time()
         except ValueError:
             return render(request, 'editar_reserva.html', {
-                'reserva': reserva, 'cafe':cafe,
+                'compra': compra, 'filme':filme,
                 'error_message': 'Formato de data ou horário inválido.'
             })
 
         today_date = datetime.today().date()
-        if data_reserva < today_date:
+        if data_compra < today_date:
             return render(request, 'editar_reserva.html', {
-                'reserva': reserva, 'cafe':cafe,
+                'compra': compra, 'filme':filme,
                 'error_message': 'A data selecionada deve ser futura.'
             })
 
         if numero_de_pessoas <= 0:
             return render(request, 'editar_reserva.html', {
-                'reserva': reserva, 'cafe':cafe,
+                'compra': compra, 'filme':filme,
                 'error_message': 'O número de pessoas deve ser maior que zero.'
             })
 
-        reservas_conflitantes = ReservaCafe.objects.filter(
-            cafe=cafe,
-            data_reserva=data_reserva,
-            horario_reserva=horario_reserva
-        ).exclude(id=reserva.id)
+        compras_conflitantes = compraFilme.objects.filter(
+            filme=filme,
+            data_compra=data_compra,
+            horario_compra=horario_compra
+        ).exclude(id=compra.id)
 
-        if reservas_conflitantes.exists():
+        if compras_conflitantes.exists():
             return render(request, 'editar_reserva.html', {
-                'reserva': reserva, 'cafe':cafe,
-                'error_message': 'Café já reservado para o horário solicitado!'
+                'compra': compra, 'filme':filme,
+                'error_message': 'Café já comprado para o horário solicitado!'
             })
 
-        reserva.data_reserva = data_reserva
-        reserva.horario_reserva = horario_reserva
-        reserva.numero_de_pessoas = numero_de_pessoas
-        reserva.observacao = observacao
-        reserva.save()
+        compra.data_compra = data_compra
+        compra.horario_compra = horario_compra
+        compra.numero_de_pessoas = numero_de_pessoas
+        compra.observacao = observacao
+        compra.save()
         
-        messages.success(request, 'Reserva atualizada com sucesso.')
-        return redirect('minhas_reservas')
+        messages.success(request, 'compra atualizada com sucesso.')
+        return redirect('minhas_compras')
     
     return render(request, 'editar_reserva.html', {
-        'reserva': reserva, 'cafe':cafe
+        'compra': compra, 'filme':filme
     })
 
 @login_required
-def enviar_whatsapp(request, cafe_id):
-    cafeteria = get_object_or_404(Cafe, pk=cafe_id)
+def enviar_whatsapp(request, filme_id):
+    cafeteria = get_object_or_404(filme, pk=filme_id)
     if cafeteria.whatsapp:
         whatsapp_url = f"https://wa.me/{cafeteria.whatsapp}"
         return redirect(whatsapp_url)
     else:
         messages.error(request, "Número de WhatsApp não disponível.")
-        return HttpResponseRedirect(reverse('perfil_cafeteria', args=[cafe_id]))
+        return HttpResponseRedirect(reverse('perfil_cafeteria', args=[filme_id]))
 
-def enviar_email(request, cafe_id):
-    cafeteria = get_object_or_404(Cafe, pk=cafe_id)
+def enviar_email(request, filme_id):
+    cafeteria = get_object_or_404(filme, pk=filme_id)
     if request.method == 'POST':
         mensagem = request.POST.get('mensagem', '')
         send_mail(
-            'Mensagem do MyCafeApp',
+            'Mensagem do MyfilmeApp',
             mensagem,
             'from@example.com',
             [cafeteria.email],
@@ -310,34 +310,34 @@ def enviar_email(request, cafe_id):
     return render(request, 'enviar_email.html', {'cafeteria': cafeteria})
 
 @login_required
-def excluir_reserva(request, reserva_id):
-    reserva = get_object_or_404(ReservaCafe, id=reserva_id)
+def excluir_compra(request, compra_id):
+    compra = get_object_or_404(comprafilme, id=compra_id)
     
     if request.method == 'POST':
-        reserva.delete()
-        messages.success(request, 'Reserva excluída com sucesso.')
-        return redirect('minhas_reservas')
+        compra.delete()
+        messages.success(request, 'compra excluída com sucesso.')
+        return redirect('minhas_compras')
     
     return render(request, 'excluir_reserva.html', {
-        'reserva': reserva
+        'compra': compra
     })
 
 @login_required
-def favoritar(request, cafe_id):
-    cafe = get_object_or_404(Cafe, id=cafe_id)
+def favoritar(request, filme_id):
+    filme = get_object_or_404(filme, id=filme_id)
     
     if request.method == 'POST' or request.method == 'GET':
         usuario = request.user
         
-        favorito_existente = Favorito.objects.filter(usuario=usuario, cafe=cafe).exists()
+        favorito_existente = Favorito.objects.filter(usuario=usuario, filme=filme).exists()
         
         if not favorito_existente:
-            Favorito.objects.create(usuario=usuario, cafe=cafe)
-            messages.success(request, 'Cafeteria favoritada com sucesso!')
+            Favorito.objects.create(usuario=usuario, filme=filme)
+            messages.success(request, 'cafeteria favoritada com sucesso!')
         else:
-            favorito = Favorito.objects.filter(usuario=usuario, cafe=cafe).first()
+            favorito = Favorito.objects.filter(usuario=usuario, filme=filme).first()
             favorito.delete()  # Remove o favorito se existir
-            messages.success(request, 'Cafeteria removida dos favoritos.')
+            messages.success(request, 'cafeteria removida dos favoritos.')
         
         return redirect('favoritos')
     
@@ -353,17 +353,17 @@ def lista_favoritos(request):
         return redirect('login')
     
 @login_required
-def registrar_historico(request, cafe_id): 
-    cafe = get_object_or_404(Cafe, id=cafe_id)
+def registrar_historico(request, filme_id): 
+    filme = get_object_or_404(filme, id=filme_id)
     
     usuario = request.user
     # Evita múltiplas entradas no mesmo dia
-    visita_hoje = Historico.objects.filter(usuario=usuario, cafe=cafe, visited_at__date=timezone.now().date()).exists()
+    visita_hoje = Historico.objects.filter(usuario=usuario, filme=filme, visited_at__date=timezone.now().date()).exists()
     
     if not visita_hoje:
-        Historico.objects.create(usuario=usuario, cafe=cafe)
+        Historico.objects.create(usuario=usuario, filme=filme)
 
-    return redirect('cafe_detalhes', cafe_id=cafe.id)
+    return redirect('filme_detalhes', filme_id=Filme.id)
 
 @login_required
 def lista_historico(request):
@@ -374,14 +374,14 @@ def lista_historico(request):
         return redirect('login')
     
 @login_required
-def detalhes(request, cafe_id):
-    cafe = get_object_or_404(Cafe, id=cafe_id)
+def detalhes(request, filme_id):
+    filme = get_object_or_404(filme, id=filme_id)
     range_5 = range(1, 6)
     usuario = request.user
-    favorito = Favorito.objects.filter(usuario=usuario, cafe=cafe).exists()
-    detalhes_cafe = cafe.detalhes()
+    favorito = Favorito.objects.filter(usuario=usuario, filme=filme).exists()
+    detalhes_filme = Filme.detalhes()
 
-    outras_cafeterias = list(Cafe.objects.exclude(id=cafe_id))
+    outras_cafeterias = list(Filme.objects.exclude(id=filme_id))
     random.shuffle(outras_cafeterias)
     outras_cafeterias = outras_cafeterias[:4]
 
@@ -390,18 +390,18 @@ def detalhes(request, cafe_id):
 
     visita_hoje = Historico.objects.filter(
         usuario=usuario, 
-        cafe=cafe, 
+        filme=filme, 
         visited_at__date=today,
     ).exists()
 
     if not visita_hoje:
-        Historico.objects.create(usuario=usuario, cafe=cafe, visited_at=timezone.now())
+        Historico.objects.create(usuario=usuario, filme=filme, visited_at=timezone.now())
 
     star_range = range(1, 6)
 
     return render(request, 'detalhes.html', {
-        'cafe': cafe,
-        'detalhes_cafe': detalhes_cafe,
+        'filme': filme,
+        'detalhes_filme': detalhes_filme,
         'favorito': favorito,
         'star_range': star_range,
         'range_5': range_5,
@@ -410,7 +410,7 @@ def detalhes(request, cafe_id):
     
 def limpar_historico_duplicado():
     # Encontrar a última visita para cada usuário e cafeteria por dia
-    ultimas_visitas = Historico.objects.values('usuario_id', 'cafe_id', 'visited_at__date').annotate(
+    ultimas_visitas = Historico.objects.values('usuario_id', 'filme_id', 'visited_at__date').annotate(
         ultima_visita=Max('visited_at')
     )
 
@@ -434,7 +434,7 @@ def login_view(request):
         if user is not None:
             login(request, user)
             if user.groups.filter(name='Empresários').exists():
-                return redirect('cafeterias_empresarios')
+                return redirect('home')
             else: 
                 return redirect('home')
         else:
@@ -450,17 +450,17 @@ def logout(request):
     return redirect('home')
 
 @login_required
-def minhas_reservas(request):
+def minhas_compras(request):
     try:
         cliente = UserCliente.objects.get(email=request.user.email)
     except UserCliente.DoesNotExist:
         return redirect('login')
 
-    reservas = ReservaCafe.objects.filter(cliente=cliente)
-    return render(request, 'minhas_reservas.html', {'reservas': reservas})
+    compras = compraFilme.objects.filter(cliente=cliente)
+    return render(request, 'minhas_compras.html', {'compras': compras})
 
-def perfil_cafeteria(request, cafe_id):
-    cafeteria = get_object_or_404(Cafe, pk=cafe_id)
+def perfil_cafeteria(request, filme_id):
+    cafeteria = get_object_or_404(filme, pk=filme_id)
     return render(request, 'perfil_cafeteria.html', {'cafeteria': cafeteria})
 
 def UserCadastro(request):
@@ -510,19 +510,15 @@ def cadastro_empresario_sucesso(request):
 def cafeterias_empresarios(request):
     usuario = request.user
     empresaario = usuario.usercliente
-    cafeterias = Cafe.objects.filter(empresario=empresaario)
+    cafeterias = Filme.objects.filter(empresario=empresaario)
     return render(request, 'cafeterias_empresarios.html', {'cafeterias': cafeterias})
-
-@login_required
-def home_empresario(request):
-    return render(request, 'cafeterias_empresarios.html')
 
 def acesso_negado_cadastrar_cafeteria(request):
     return render(request, 'acesso_negado_cadastrar_cafeteria.html')
 
 @login_required
-def avaliar_cafe(request, cafe_id):
-    cafe = get_object_or_404(Cafe, id=cafe_id)
+def avaliar_filme(request, filme_id):
+    filme = get_object_or_404(filme, id=filme_id)
     try:
         cliente = get_object_or_404(UserCliente, user=request.user)
     except UserCliente.DoesNotExist:
@@ -537,10 +533,10 @@ def avaliar_cafe(request, cafe_id):
 
         if not avaliacao or not comentario or not valor_gasto:
             messages.error(request, 'Por favor, preencha todos os campos obrigatórios.')
-            return render(request, 'avaliar_cafe.html', {'cafe': cafe, 'range': range(1, 6)})
+            return render(request, 'avaliar_Filme.html', {'filme': filme, 'range': range(1, 6)})
 
         Avaliacao.objects.create(
-            cafe=cafe,
+            filme=filme,
             cliente=cliente,
             avaliacao=int(avaliacao),
             comentario=comentario,
@@ -551,7 +547,7 @@ def avaliar_cafe(request, cafe_id):
         messages.success(request, 'Avaliação enviada com sucesso.')
         return redirect('avaliacao_sucesso')
 
-    return render(request, 'avaliar_cafe.html', {'cafe': cafe, 'range': range(1, 6)})
+    return render(request, 'avaliar_Filme.html', {'filme': filme, 'range': range(1, 6)})
 
 @login_required
 def avaliacao_sucesso(request):
@@ -612,68 +608,68 @@ def editar_perfil(request):
 def editar_perfil_sucesso(request):
     return render(request, 'editar_perfil_sucesso.html')
 
-def editar_cadastro_cafe(request, cafe_id):
+def editar_cadastro_filme(request, filme_id):
     # Obter o UserCliente associado ao usuário logado
     user_cliente = request.user.usercliente
     
     # Obter a cafeteria específica associada ao UserCliente
-    cafe = get_object_or_404(Cafe, id=cafe_id, empresario=user_cliente)
+    filme = get_object_or_404(filme, id=filme_id, empresario=user_cliente)
     
     if request.method == 'POST':
-        responsavel = request.POST.get('responsavel') or cafe.responsavel
-        nome_cafeteria = request.POST.get('nome_cafeteria') or cafe.nome_cafeteria
-        endereco = request.POST.get('endereco') or cafe.endereco
-        descricao = request.POST.get('descricao') or cafe.descricao
-        email = request.POST.get('email') or cafe.email
-        whatsapp = request.POST.get('whatsapp') or cafe.whatsapp
-        horas_funcionamento = request.POST.get('horas_funcionamento') or cafe.horas_funcionamento
-        link_redesocial = request.POST.get('link_redesocial') or cafe.link_redesocial
-        foto_ambiente = request.FILES.get('foto_ambiente') or cafe.foto_ambiente
-        cnpj = request.POST.get('cnpj') or cafe.cnpj
-        site_cafeteria = request.POST.get('site_cafeteria') or cafe.site_cafeteria
+        responsavel = request.POST.get('responsavel') or Filme.responsavel
+        nome_cafeteria = request.POST.get('nome_cafeteria') or Filme.nome_cafeteria
+        endereco = request.POST.get('endereco') or Filme.endereco
+        descricao = request.POST.get('descricao') or Filme.descricao
+        email = request.POST.get('email') or Filme.email
+        whatsapp = request.POST.get('whatsapp') or Filme.whatsapp
+        horas_funcionamento = request.POST.get('horas_funcionamento') or Filme.horas_funcionamento
+        link_redesocial = request.POST.get('link_redesocial') or Filme.link_redesocial
+        foto_ambiente = request.FILES.get('foto_ambiente') or Filme.foto_ambiente
+        cnpj = request.POST.get('cnpj') or Filme.cnpj
+        site_cafeteria = request.POST.get('site_cafeteria') or Filme.site_cafeteria
 
         if not whatsapp.isdigit() or len(whatsapp) != 13:
-            return render(request, 'editar_cadastro_cafe.html', {
+            return render(request, 'editar_cadastro_Filme.html', {
                 'erro': 'O número de WhatsApp deve conter apenas números e ter 13 dígitos.',
-                'cafe': cafe
+                'filme': filme
             })
 
         if not cnpj.isdigit() or len(cnpj) != 14:
-            return render(request, 'editar_cadastro_cafe.htmll', {
+            return render(request, 'editar_cadastro_Filme.htmll', {
                 'erro': 'O CNPJ deve conter apenas números e ter 14 dígitos.',
-                'cafe': cafe
+                'filme': filme
             })
         
-        if Cafe.objects.filter(cnpj=cnpj).exclude(pk=cafe.pk).exists():
-            return render(request, 'editar_cadastro_cafe.html', {
+        if Filme.objects.filter(cnpj=cnpj).exclude(pk=Filme.pk).exists():
+            return render(request, 'editar_cadastro_Filme.html', {
                 'erro': 'Este CNPJ já está em uso por outra cafeteria.',
-                'cafe': cafe
+                'filme': filme
             })
         
-        if Cafe.objects.filter(whatsapp=whatsapp).exclude(pk=cafe.pk).exists():
-            return render(request, 'editar_cadastro_cafe.html', {
+        if Filme.objects.filter(whatsapp=whatsapp).exclude(pk=Filme.pk).exists():
+            return render(request, 'editar_cadastro_Filme.html', {
                 'erro': 'Este Whatsapp já está em uso por outra cafeteria.',
-                'cafe': cafe
+                'filme': filme
             })
 
-        cafe.responsavel = responsavel
-        cafe.nome_cafeteria = nome_cafeteria
-        cafe.endereco = endereco
-        cafe.descricao = descricao
-        cafe.email = email
-        cafe.whatsapp = whatsapp
-        cafe.horas_funcionamento = horas_funcionamento
-        cafe.link_redesocial = link_redesocial
-        cafe.foto_ambiente = foto_ambiente
-        cafe.cnpj = cnpj
-        cafe.site_cafeteria = site_cafeteria
+        Filme.responsavel = responsavel
+        Filme.nome_cafeteria = nome_cafeteria
+        Filme.endereco = endereco
+        Filme.descricao = descricao
+        Filme.email = email
+        Filme.whatsapp = whatsapp
+        Filme.horas_funcionamento = horas_funcionamento
+        Filme.link_redesocial = link_redesocial
+        Filme.foto_ambiente = foto_ambiente
+        Filme.cnpj = cnpj
+        Filme.site_cafeteria = site_cafeteria
         
-        cafe.save()
+        Filme.save()
 
         return redirect('editar_cadastro_cafeteria_sucesso')
     
-    return render(request, 'editar_cadastro_cafe.html', {
-        'cafe': cafe
+    return render(request, 'editar_cadastro_Filme.html', {
+        'filme': filme
     })
 
 def editar_cadastro_cafeteria_sucesso(request):

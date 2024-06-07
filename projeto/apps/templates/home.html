@@ -123,38 +123,8 @@
 }
 </style>
 
-<!-- Busca -->
-
-<form action="{% url 'buscar_cafeterias' %}" method="GET" class="search-form">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-8"> <!-- Ajustado para maior largura -->
-                <div class="input-group mb-3">
-                    <input type="text" class="form-control search-input" placeholder="Buscar cafeterias..." name="termo" id="search-input">
-                    <div class="input-group-append" >
-                        <button class="btn search-icon" type="submit">
-                            <i class="fas fa-search" id="search-icon"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</form>
-
-<!-- Exibir mensagem de alerta, se houver -->
-{% if mensagem_alerta %}
-<div class="container">
-    <div class="alert alert-info" role="alert">
-        {{ mensagem_alerta }}
-    </div>
-</div>
-{% endif %}
-
-<!-- Fim da Busca -->
-
 <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
-    <h1 style="margin: 0 0px 10px 25px;">Cafeterias</h1>
+    <h1 style="margin: 0 0px 10px 25px;">Filmes</h1>
     <div class="cards">
     {% for cafe in cafes %}
         <div class="card">
@@ -183,21 +153,4 @@
     {% endfor %}
 </div>
 </div>
-
-<!-- Efeito para busca -->
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const searchInput = document.getElementById('search-input');
-        const searchIcon = document.getElementById('search-icon');
-    
-        searchInput.addEventListener('input', function() {
-            // Muda a cor da lupa com base na presença de texto
-            searchIcon.style.color = searchInput.value.trim() ? '#333' : '#ccc';
-        });
-    });
-    </script>
-
-<!-- Fim -->
-
 {% endblock %}
